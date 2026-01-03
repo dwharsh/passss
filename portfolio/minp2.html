@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Advanced Password Generator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: url("mip2photo.jpg") no-repeat center center fixed;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    color: white;
+}
+
+.container {
+    background: rgba(0,0,0,0.85);
+    padding: 25px;
+    border-radius: 15px;
+    width: 360px;
+    box-shadow: 0 0 30px #22c55e;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin: 8px 0;
+    font-size: 0.95rem;
+}
+
+input[type="number"] {
+    width: 100%;
+    padding: 8px;
+    border-radius: 6px;
+    border: none;
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+.options label {
+    display: flex;
+    justify-content: space-between;
+}
+
+button {
+    width: 100%;
+    margin-top: 10px;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: #22c55e;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #16a34a;
+}
+
+.result {
+    background: black;
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    word-break: break-all;
+    font-size: 1.1rem;
+    min-height: 40px;
+}
+
+/* Strength Meter */
+.strength {
+    height: 8px;
+    width: 100%;
+    background: #334155;
+    border-radius: 10px;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+.strength-bar {
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s;
+}
+
+.weak { background: red; }
+.medium { background: orange; }
+.strong { background: limegreen; }
+
+.actions {
+    display: flex;
+    gap: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Password Generator</h2>
+
+    <!-- Length -->
+    <label>Password Length</label>
+    <input type="number" id="length" min="4" max="32" value="12">
+
+    <!-- Options -->
+    <div class="options">
+        <label>Uppercase <input type="checkbox" id="upper" checked></label>
+        <label>Lowercase <input type="checkbox" id="lower" checked></label>
+        <label>Numbers <input type="checkbox" id="numbers" checked></label>
+        <label>Special Characters <input type="checkbox" id="symbols" checked></label>
+    </div>
+
+    <!-- Buttons -->
+    <button onclick="generatePassword()">Generate Password</button>
+
+    <div class="actions">
+        <button onclick="copyPassword()">📋 Copy</button>
+        <button onclick="clearPassword()">❌ Clear</button>
+    </div>
+
+    <!-- Result -->
+    <div class="result" id="result">Your password appears here</div>
+
+    <!-- Strength -->
+    <div class="strength">
+        <div class="strength-bar" id="strengthBar"></div>
+    </div>
+</div>
+
+<script>
+function generatePassword() {
+    const length = document.getElementById("length").value;
+    const upper = document.getElementById("upper").checked;
+    const lower = document.getElementById("lower").checked;
+    const numbers = document.getElementById("numbers").checked;
+    const symbols = document.getElementById("symbols").checked;
+
+    const U = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const L = "abcdefghijklmnopqrstuvwxyz";
+    const N = "0123456789";
+    const S = "!@#$%^&*()_+[]{}<>?";
+
+    let chars = "";
+    if (upper) chars += U;
+    if (lower) chars += L;
+    if (numbers) chars += N;
+    if (symbols) chars += S;
+
+    if (!chars) {
+        document.getElementById("result").textContent = "Select at least one option!";
+        updateStrength(0);
+        return;
+    }
+
+    let password = "";
+    for (let i = 0; i < length; i++) {
+        password += chars[Math.floor(Math.random() * chars.length)];
+    }
+
+    document.getElementById("result").textContent = password;
+    updateStrength(password.length, upper, lower, numbers, symbols);
+}
+
+function copyPassword() {
+    const text = document.getElementById("result").textContent;
+    navigator.clipboard.writeText(text);
+    alert("Password copied to clipboard!");
+}
+
+function clearPassword() {
+    document.getElementById("result").textContent = "";
+    updateStrength(0);
+}
+
+function updateStrength(len, u, l, n, s) {
+    const bar = document.getElementById("strengthBar");
+    let score = len;
+    if (u) score += 5;
+    if (l) score += 5;
+    if (n) score += 5;
+    if (s) score += 5;
+
+    if (score < 20) {
+        bar.style.width = "33%";
+        bar.className = "strength-bar weak";
+    } else if (score < 35) {
+        bar.style.width = "66%";
+        bar.className = "strength-bar medium";
+    } else {
+        bar.style.width = "100%";
+        bar.className = "strength-bar strong";
+    }
+}
+</script>
+
+</body>
+</html>
+
